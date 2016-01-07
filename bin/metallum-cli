@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+
+require "bundler/setup"
+require 'metallum-cli'
+
+config = MetallumCli::Configuration.instance
+
+MetallumCli::App.start
