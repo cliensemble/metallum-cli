@@ -37,8 +37,8 @@ module MetallumCli
     option :members
     option :similar, :type => :boolean
     option :links, :type => :boolean
-    def band(band)
-      result = Client.get_json Url.BAND band
+    def band(*band)
+      result = Client.get_json Url.BAND band.join "_"
       if result["aaData"].length > 1
         puts "Your search returned the following bands:\n"
         result["aaData"].each_with_index do |r, i|
