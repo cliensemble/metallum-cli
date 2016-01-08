@@ -44,7 +44,7 @@ module MetallumCli
     end
 
     def self.show_band_page(html, discography, members, similar, links)
-      File.write 'out.html', html
+      # File.write 'out.html', html
       page = Nokogiri::HTML(html)
       band_values = {}
       band_keys = {0 => "Country", 1 => "Location", 2 => "Status", 3 => "Active since", 4 => "Genre", 5 => "Theme", 6 => "Label", 7 => "Years active"}
@@ -70,6 +70,15 @@ module MetallumCli
       end
       if members
         show_band_members page, members
+      end
+      if similar
+        page.css("div#band_tab_discography").map do |prev_elem|
+          prev_elem.previous_element.css('li:eq(4) a').map do |link|
+            show_similar_bands "#{link['href']}?showMoreSimilar=1#Similar_artists"
+          end
+        end
+      end
+      if links
       end
     end
 
@@ -104,6 +113,20 @@ module MetallumCli
       members = format_array members, member_keys
       members.each do |member|
         puts member
+      end
+    end
+    
+    def self.show_similar_bands(url)
+      res = Nokogiri::HTML get_url url
+      bands = []
+      band_keys = {0 => "Name", 1 => "Country", 2 => "Genre"}
+      res.css('tbody tr td').each do |band|
+        bands.push band.content.strip.split.join " "
+      end
+      puts "\n\n////Similar bands\\\\\\\\"
+      bands = format_array bands, band_keys
+      bands.each do |band|
+        puts band
       end
     end
     
