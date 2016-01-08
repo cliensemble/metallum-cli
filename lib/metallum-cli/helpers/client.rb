@@ -13,22 +13,22 @@ module MetallumCli
     def self.get(path)
       uri = URI("#{SITE_URL}/#{path}")
       req = Net::HTTP::Get.new(uri)
-      
+
       res = Net::HTTP.start(uri.hostname, uri.port) {|http|
         http.request(req)
       }
-      
+
       res
     end
 
     def self.get_url(path)
       uri = URI(path)
       req = Net::HTTP::Get.new(uri)
-      
+
       res = Net::HTTP.start(uri.hostname, uri.port) {|http|
         http.request(req)
       }
-      
+
       res.body
     end
 
@@ -36,13 +36,13 @@ module MetallumCli
       # puts "#{SITE_URL}/#{path}"
       json_results "#{SITE_URL}/#{path}"
     end
-    
+
     def self.json_results(url)
       response = Net::HTTP.get_response(URI.parse(url))
       data = response.body
       JSON.parse(data)
     end
-    
+
     def self.show_band_page(html, discography, members, similar, links)
       # File.write 'out.html', html
       page = Nokogiri::HTML(html)
@@ -68,8 +68,11 @@ module MetallumCli
           show_band_discography link['href']
         }
       end
+      if members
+        show_band_members page
+      end
     end
-    
+
     def self.show_band_discography(url)
       res = Nokogiri::HTML get_url url
       discography = []
@@ -84,6 +87,17 @@ module MetallumCli
         i += 1
         puts "#{album}"
         puts "\n" if i % 4 == 0
+      end
+    end
+
+    def self.show_band_members(page)
+      members = []
+      page.css('div#band_tab_members_current div table tr td').each_with_index do |member, i|
+        members.push member.content.strip.split.join " "
+      end
+      puts "\n\n////Members\\\\\\\\"
+      members.each do |member|
+        puts member
       end
     end
 

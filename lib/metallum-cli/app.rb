@@ -1,5 +1,4 @@
 require 'thor'
-require 'metallum-cli/helpers/iniparse'
 require 'metallum-cli/helpers/client'
 require 'metallum-cli/helpers/url'
 require 'base64'
@@ -35,7 +34,7 @@ module MetallumCli
 
     desc "band", "Search for a band"
     option :discography
-    option :members, :type => :boolean
+    option :members
     option :similar, :type => :boolean
     option :links, :type => :boolean
     def band(band)
@@ -49,13 +48,13 @@ module MetallumCli
         puts "Select a band number:"
         choice = STDIN.gets.chomp
         band = Nokogiri::HTML(result["aaData"][choice.to_i - 1][0]).css('a')
-        band.map{ |link| 
+        band.map{ |link|
           Client.show_band_page(Client.get_url(link['href']), options[:discography], options[:members], options[:similar], options[:links])
         }
         # Client.get_url band
       elsif result["aaData"].length == 1
         band = Nokogiri::HTML(result["aaData"][0][0]).css('a')
-        band.map{ |link| 
+        band.map{ |link|
           Client.show_band_page(Client.get_url(link['href']), options[:discography], options[:members], options[:similar], options[:links])
         }
       else
