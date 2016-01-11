@@ -36,7 +36,7 @@ module MetallumCli
     option :discography
     option :members
     option :similar, :type => :boolean
-    option :links, :type => :boolean
+    option :links
     def band(*band)
       result = Client.get_json Url.BAND band.join "_"
       if result["aaData"].length > 1

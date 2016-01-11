@@ -79,6 +79,19 @@ module MetallumCli
         end
       end
       if links
+        sel = ''
+        case links
+          when 'official' then sel = 'Official'
+          when 'merchandise' then sel = 'Official_merchandise'
+          when 'unofficial' then sel = 'Unofficial'
+          when 'labels' then sel = 'Labels'
+          when 'tablatures' then sel = 'Tablatures'
+        end
+        page.css("div#band_tab_discography").map do |prev_elem|
+          prev_elem.previous_element.css('li:eq(5) a').map do |link|
+            show_band_links link['href'], sel
+          end
+        end
       end
     end
 
@@ -127,6 +140,26 @@ module MetallumCli
       bands = format_array bands, band_keys
       bands.each do |band|
         puts band
+      end
+    end
+    
+    def self.show_band_links(url, param)
+      res = Nokogiri::HTML get_url url
+      links = []
+      link_keys = {0 => "Name", 1 => "Country", 2 => "Genre"}
+      if param.eql? ""
+        res.css("table tr td a").each do |link|
+          links.push "#{link['title'].sub("Go to: ","")}: #{link['href']}"
+        end
+      else
+        res.css("table#linksTable#{param.capitalize} tr td a").each do |link|
+          links.push "#{link['title'].sub("Go to: ","")}: #{link['href']}"
+        end
+      end
+      puts "\n\n////Links\\\\\\\\"
+      links = format_array links, link_keys
+      links.each do |link|
+        puts link
       end
     end
     
