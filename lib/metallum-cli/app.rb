@@ -20,16 +20,37 @@ module MetallumCli
       end
     end
 
-    desc "album", "Busca por um album"
+    desc "album", "Search for an album"
     def album(album)
       result = Client.get "SysRebootRpm.htm?Reboot=Reboot"
       puts result.status
     end
 
-    desc "artist", "Busca por um artista"
-    def artist(artist)
-      result = Client.get "SysRebootRpm.htm?Reboot=Reboot"
-      puts result.status
+    desc "artist", "Search for an artist"
+    option :band
+    def artist(*artist)
+      result = Client.get_json Url.ARTIST artist.join "_"
+      if result["aaData"].length > 1
+        puts "Your search returned the following artists:\n"
+        result["aaData"].each_with_index do |r, i|
+          artist = Nokogiri::HTML(r[0]).css('a').inner_html
+          puts "#{i+1} -> #{artist} | #{r[2]} | #{r[1]}\n"
+        end
+        puts "Select a artist number:"
+        choice = STDIN.gets.chomp
+        artist = Nokogiri::HTML(result["aaData"][choice.to_i - 1][0]).css('a')
+        artist.map{ |link|
+          Client.show_artist_page(Client.get_url(link['href']), options[:band])
+        }
+        # Client.get_url artist
+      elsif result["aaData"].length == 1
+        artist = Nokogiri::HTML(result["aaData"][0][0]).css('a')
+        artist.map{ |link|
+          Client.show_artist_page(Client.get_url(link['href']), options[:band])
+        }
+      else
+        puts "No reults found"
+      end
     end
 
     desc "band", "Search for a band"

@@ -162,6 +162,58 @@ module MetallumCli
         puts link
       end
     end
+
+    def self.show_artist_page(html, band)
+      # File.write 'out.html', html
+      page = Nokogiri::HTML(html)
+      artist_values = {}
+      biography = []
+      artist_keys = {0 => "Location", 1 => "Age", 2 => "Place of origin", 3 => "Gender"}
+      page.css('div#member_info dl dd').each_with_index do |item, index|
+        artist_values[artist_keys[index]] = item.content.strip.split.join " "
+      end
+      page.css('div.band_comment').css(".title_comment").remove
+      page.css('div.band_comment').each do |item|
+        biography.push item.content.strip.split.join " "
+      end
+      puts "\n\n////#{page.css('h1.band_member_name').first.content}\\\\\\\\"
+      artist_values.each do |k, v|
+        puts "#{k}: #{v}"
+      end
+      biography.each do |bio|
+        puts bio
+      end
+      if band
+        show_artist_bands page, band
+      end
+    end
+
+    def self.show_artist_bands(res, param)
+      bands = []
+      albums = []
+      single_album = []
+      album_keys = {0 => "Year", 1 => "Name", 2 => "Role"}
+      res.css("div#artist_tab_#{param} div.ui-tabs-panel-content div.member_in_band").each do |band|
+        bands.push band.css("h3.member_in_band_name").inner_text
+        band.css('td').drop(3).map.with_index do |item, index|
+          i = index % 3
+          single_album.push "#{album_keys[i]}: #{item.content.strip.split.join " "}"
+          if i == index - 1
+            single_album = []
+          end
+        end
+        albums.push single_album
+      end
+      # p bands
+      puts "\n\n////Bands\\\\\\\\"
+      # albums = format_array albums, album_keys
+      bands.each_with_index do |band, i|
+        puts "\n#{band}"
+        albums[i].each do |album|
+          puts album
+        end
+      end
+    end
     
     def self.format_array(arr, indexes)
       unique = indexes.length

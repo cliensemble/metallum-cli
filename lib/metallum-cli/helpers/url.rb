@@ -8,5 +8,9 @@ module MetallumCli
     def self.BAND(band)
       "search/ajax-band-search/?field=name&query=#{band}&sEcho=1&iColumns=3&sColumns=&iDisplayStart=0&iDisplayLength=200&mDataProp_0=0&mDataProp_1=1&mDataProp_2=2"
     end
+    
+    def self.ARTIST(artist)
+      "search/ajax-artist-search/?field=alias&query=#{artist}&sEcho=1&iColumns=4&sColumns=&iDisplayStart=0"
+    end
   end
 end
