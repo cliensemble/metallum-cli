@@ -77,18 +77,11 @@ module MetallumCli
       end
     end
 
-    desc "band", "Search for a band"
+    desc "band BAND NAME", "Search for a band"
     option :discography
     option :members
     option :similar, :type => :boolean
     option :links
-    long_desc <<-LONGDESC
-      Usage:
-      --discography [all,demos,lives,misc] - show the band's discography
-      --members [all,past,live,guest] - show the band's members
-      --similar - show similar bands
-      --links [all,official,merchandising,unofficial,misc] - show related links
-    LONGDESC
     def band(*band)
       result = Client.get_json Url.BAND band.join "_"
       if result["aaData"].length > 1
