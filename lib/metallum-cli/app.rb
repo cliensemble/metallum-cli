@@ -1,8 +1,11 @@
-require 'thor'
+require 'base64'
+require 'metallum-cli/helpers/album'
+require 'metallum-cli/helpers/artist'
+require 'metallum-cli/helpers/band'
 require 'metallum-cli/helpers/client'
 require 'metallum-cli/helpers/url'
-require 'base64'
 require 'nokogiri'
+require 'thor'
 
 module MetallumCli
   class App < Thor
@@ -34,13 +37,13 @@ module MetallumCli
         choice = STDIN.gets.chomp
         album = Nokogiri::HTML(result["aaData"][choice.to_i - 1][1]).css('a')
         album.map{ |link|
-          Client.show_album_page(Client.get_url(link['href']), option[:reviews])
+          Album.show_album_page(Client.get_url(link['href']), options[:reviews])
         }
         # Client.get_url album
       elsif result["aaData"].length == 1
         album = Nokogiri::HTML(result["aaData"][0][1]).css('a')
         album.map{ |link|
-          Client.show_album_page(Client.get_url(link['href']), options[:reviews])
+          Album.show_album_page(Client.get_url(link['href']), options[:reviews])
         }
       else
         puts "No reults found"
@@ -61,13 +64,13 @@ module MetallumCli
         choice = STDIN.gets.chomp
         artist = Nokogiri::HTML(result["aaData"][choice.to_i - 1][0]).css('a')
         artist.map{ |link|
-          Client.show_artist_page(Client.get_url(link['href']), options[:band])
+          Artist.show_artist_page(Client.get_url(link['href']), options[:band])
         }
         # Client.get_url artist
       elsif result["aaData"].length == 1
         artist = Nokogiri::HTML(result["aaData"][0][0]).css('a')
         artist.map{ |link|
-          Client.show_artist_page(Client.get_url(link['href']), options[:band])
+          Artist.show_artist_page(Client.get_url(link['href']), options[:band])
         }
       else
         puts "No reults found"
@@ -98,13 +101,13 @@ module MetallumCli
         choice = STDIN.gets.chomp
         band = Nokogiri::HTML(result["aaData"][choice.to_i - 1][0]).css('a')
         band.map{ |link|
-          Client.show_band_page(Client.get_url(link['href']), options[:discography], options[:members], options[:similar], options[:links])
+          Band.show_band_page(Client.get_url(link['href']), options[:discography], options[:members], options[:similar], options[:links])
         }
         # Client.get_url band
       elsif result["aaData"].length == 1
         band = Nokogiri::HTML(result["aaData"][0][0]).css('a')
         band.map{ |link|
-          Client.show_band_page(Client.get_url(link['href']), options[:discography], options[:members], options[:similar], options[:links])
+          Band.show_band_page(Client.get_url(link['href']), options[:discography], options[:members], options[:similar], options[:links])
         }
       else
         puts "No reults found"
