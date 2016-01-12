@@ -190,28 +190,25 @@ module MetallumCli
 
     def self.show_artist_bands(res, param)
       bands = []
-      albums = []
-      single_album = []
+      album = []
       album_keys = {0 => "Year", 1 => "Name", 2 => "Role"}
+      a = 0
       res.css("div#artist_tab_#{param} div.ui-tabs-panel-content div.member_in_band").each do |band|
         bands.push band.css("h3.member_in_band_name").inner_text
-        band.css('td').drop(3).map.with_index do |item, index|
-          i = index % 3
-          single_album.push "#{album_keys[i]}: #{item.content.strip.split.join " "}"
-          if i == index - 1
-            single_album = []
+        band.css('table tr td').each_with_index do |item, index|
+          i = (index + 3) % 3
+          album.push "#{album_keys[i]}: #{item.content.strip.split.join " "}"
+          if i == 2
+            bands.push album
+            album = []
+            a += 1
           end
         end
-        albums.push single_album
       end
-      # p bands
       puts "\n\n////Bands\\\\\\\\"
-      # albums = format_array albums, album_keys
-      bands.each_with_index do |band, i|
-        puts "\n#{band}"
-        albums[i].each do |album|
-          puts album
-        end
+      bands.each do |band|
+        puts band
+        puts "\n"
       end
     end
     
