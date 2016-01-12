@@ -21,9 +21,30 @@ module MetallumCli
     end
 
     desc "album", "Search for an album"
-    def album(album)
-      result = Client.get "SysRebootRpm.htm?Reboot=Reboot"
-      puts result.status
+    option :reviews, :type => :boolean
+    def album(*album)
+      result = Client.get_json Url.ALBUM album.join "_"
+      if result["aaData"].length > 1
+        puts "Your search returned the following albums:\n"
+        result["aaData"].each_with_index do |r, i|
+          album = Nokogiri::HTML(r[0]).css('a').inner_html
+          puts "#{i+1} -> #{album} | #{r[2]}\n"
+        end
+        puts "Select a album number:"
+        choice = STDIN.gets.chomp
+        album = Nokogiri::HTML(result["aaData"][choice.to_i - 1][1]).css('a')
+        album.map{ |link|
+          Client.show_album_page(Client.get_url(link['href']), option[:reviews])
+        }
+        # Client.get_url album
+      elsif result["aaData"].length == 1
+        album = Nokogiri::HTML(result["aaData"][0][1]).css('a')
+        album.map{ |link|
+          Client.show_album_page(Client.get_url(link['href']), options[:reviews])
+        }
+      else
+        puts "No reults found"
+      end
     end
 
     desc "artist", "Search for an artist"
@@ -58,6 +79,13 @@ module MetallumCli
     option :members
     option :similar, :type => :boolean
     option :links
+    long_desc <<-LONGDESC
+      Usage:
+      --discography [all,demos,lives,misc] - show the band's discography
+      --members [all,past,live,guest] - show the band's members
+      --similar - show similar bands
+      --links [all,official,merchandising,unofficial,misc] - show related links
+    LONGDESC
     def band(*band)
       result = Client.get_json Url.BAND band.join "_"
       if result["aaData"].length > 1

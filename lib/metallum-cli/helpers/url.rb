@@ -12,5 +12,9 @@ module MetallumCli
     def self.ARTIST(artist)
       "search/ajax-artist-search/?field=alias&query=#{artist}&sEcho=1&iColumns=4&sColumns=&iDisplayStart=0"
     end
+    
+    def self.ALBUM(album)
+      "search/ajax-album-search/?field=title&query=#{album}&sEcho=1&iColumns=4&sColumns=&iDisplayStart=0"
+    end
   end
 end
